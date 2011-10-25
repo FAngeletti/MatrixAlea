@@ -1,6 +1,6 @@
 classdef ltruncated
-    %TRUNCATEDLAW create a truncated law from a Law L on an intervall I.
-    %   Detailed explanation goes here
+    %ltruncated Truncated law generated from a Law L on an intervall I.
+    %  e
     
     properties
         I

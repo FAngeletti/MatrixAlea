@@ -64,10 +64,11 @@ classdef matrixLaw
             x=zeros(nt,1);
             [state,sink]=obj.initie();
           %  CurrentT=obj.E^nt;
+            CLaws=obj.Laws;
             for i=1:(nt-1)
                CurrentT=obj.E^(nt-i);
                 newState=rvFinite( obj.E(state,:).* CurrentT(:,sink)' );
-                Law=obj.Laws{state,newState};
+                Law=CLaws{state,newState};
                 x(i)=Law.rv();
                 state=newState;
             end

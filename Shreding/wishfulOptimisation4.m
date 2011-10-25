@@ -1,4 +1,4 @@
-function [ solution, err ] = wishfulOptimisation2( f, nIter,epsT, start,verbosity )
+function [ solution, err ] = wishfulOptimisation4( f, nIter,epsT, start,verbosity )
 %wishfullOptimisation(f,nIter, epsT, start, verbosity) Try to optimize the function f exploiting a
 %priori information on f with less than nIter steps of optimisation.
 % The algorithm stops as soon as the maximum absolute error is less than epsT. 
@@ -12,7 +12,8 @@ v=verbosity;
 s=size(start);
 nL=s(1);
 dimM=s(2);
-grad=ones(s);
+
+
 
 if(verbosity>=4)
 errv=zeros(1,nIter);
@@ -27,12 +28,8 @@ prev=fit;
 
 epsD=1e-3;
 
+grad=init(f,solution,fit,epsD);
 
-for i=1:nL
-for j=1:dimM
-grad(i,j)=verifyGrad(f,solution,fit,epsD,i,j);
-end
-end
 
 vprintf(v,'Initial gradient : \n');
 vdisp(v,3,grad);
@@ -61,40 +58,19 @@ vprintf(v,2,'----- Iteration %d \n',n);
     
 prev=fit;
 
-step= -(sur*fit)./grad;
-m=max(max(abs(step)));
-if( m > maxstep)
-step= (maxstep/m).*step;
-m=maxstep;
-end
+[step,m]=choose_step(sur,fit,grad,maxstep);
+
 vdisp(3,'Current step : '); vdisp(v,3,step); 
+vdisp(v,3,'Current vectorial error : '); vdisp(v,3,fit); 
+vdisp(v,3,'Current pseudo-gradient : '); vdisp(v,3,grad); 
 
-solution=solution+step; vdisp(v,3,'Proposed solution : '); vdisp(v,3,solution);
-fit=f(solution); vdisp(v,3,'Current vectorial error : '); vdisp(v,3,fit); 
-
-sel=find(step> epsR * m);
-grad(sel)=(fit(sel)-prev(sel))./step(sel);
-
-err2=fit*fit';
-if(err2>perr2)
-	solution=solution-step;
-	fit=prev;
-else
-	err2=perr2;
-end
-
-grad=protectGrad(f,solution,fit,grad,maxgrad,epsD);  vdisp(v,3,'Current pseudo-gradient : '); vdisp(v,3,grad); 
-%grad=(fit-prev)./step;
-
-
+[solution,fit,grad,err2]=make_step(f,solution,grad,step,m,maxgrad,epsD,epsR,prev,perr2);
+vdisp(v,3,'Proposed solution : '); vdisp(v,3,solution);
 
 err=errF(fit); vprintf(v,2,'Error at step %d : %f\n',n,err);
 
-if(err2<contractR*perr2)
-	sur=sur*nu;
-elseif (perr2<relaxR*err2)
-	sur=sur/nu;
-end
+sur=surrelaxation_coeff(nu,contractR,relaxR,sur,err2,perr2);
+
 
 n=n+1;
 
@@ -131,7 +107,7 @@ sel=find(grad<0 | grad>maxgrad );
 for n=1:length(sel)
 c=sel(n);
 i= 1+mod(c-1,s(1));
-j= 1+fix((c-1)/s(1)); 
+j= 1+fix((c-1)/s(1));
 g(c)=verifyGrad(f,solution,fitn,epsD,i,j );
 end
 
@@ -154,5 +130,58 @@ function vprintf(v,s,x,varargin)
 	if(v>=s)
 		fprintf(1,x,varargin{:});
 	end
+end
+
+function grad=init(f,solution,fit,epsD)
+s=size(fit);
+dimM=s(2);
+nL=s(1);
+
+grad=ones(s);
+
+% for i=1:nL
+% for j=1:dimM
+% grad(i,j)=verifyGrad(f,solution,fit,epsD,i,j);
+% end
+% end
+
+end
+
+function  [solution,fit,grad,err2]=make_step(f,solution,grad,step,m,maxgrad,epsD,epsR,prev,perr2)
+solution=solution+step; 
+fit=f(solution); 
+
+sel=find(step> epsR * m);
+grad(sel)=(fit(sel)-prev(sel))./step(sel);
+
+err2=fit*fit';
+if(err2>perr2)
+	solution=solution-step;
+	fit=prev;
+else
+	err2=perr2;
+end
+
+grad=protectGrad(f,solution,fit,grad,maxgrad,epsD);  
+%grad=(fit-prev)./step;
+
+end
+
+function [step,m]=choose_step(sur,fit,grad,maxstep)
+
+step= -(sur*fit)./grad;
+m=max(max(abs(step)));
+if( m > maxstep)
+step= (maxstep/m).*step;
+m=maxstep;
+end
+end
+
+function sur=surrelaxation_coeff(nu,contractR,relaxR,sur,err2,perr2)
+if(err2<contractR*perr2)
+	sur=sur*nu;
+elseif (perr2<relaxR*err2)
+	sur=sur/nu;
+end
 end
 

@@ -1,14 +1,13 @@
-addpath /Users/pabry/MATLAB/UTILS_STAT/
 
 %Dimension de la matrice
-d=8;
+d=32;
 
 
 %Définition de l'opérateur de projection L(M) = <A,M> 
 A=ones(d)./d;
 
 %Matrice de structure
-p=0.9;
+p=0.95;
 q=1-p ;
 
 J=zeros(d);
@@ -41,7 +40,11 @@ len=round(5*corrlen);
 Ts=CircularTs(lambdas)
 
 % Coefficients associés aix lambda_j souhaités
-targetCoeffs= [ 1.5 0 0 0];
+targetCoeffs=zeros(1,fix(d/2));
+targetCoeffs(1)=0.05;
+targetCoeffs(3)=0.025;
+targetCoeffs(5)=0.1;
+targetCoeffs(8)=0.025;
 
 if mod(d,2)==0
 symCoeffs= [ 0 targetCoeffs fliplr(targetCoeffs(1:(end-1)))  ];
@@ -53,21 +56,28 @@ end
 %Calcul des coefficients de la matrice
 diag= fft(sqrt(symCoeffs));
 %normalisation
-diag=diag-sum(diag)
-
-var=2;
-L0=lnormal(0,var);
-
-%kernel= @(v,x) exp(-((x-v(1))./var).^2./2);
-%kernel= @(v,x) exp(-2*abs((x-v(1))) );
-kernel= @(v,x) exp(-((x-v(1))./var).^4.);
+diag=real(diag-sum(diag));
 
 
-Ws=ones(length(diag),1); pts=[-8:0.025:8];
-Laws=ShredWithKernelWishfully(L0, diag', Ws,pts,kernel,diag');
+L0=lnormal(0,1);
 
-TestMixture(L0,Laws,Ws,1000,50);
-pdflen=max(abs(diag))/p + 4 * var;
+lvar=0.8;
+kernel= @(v,x) exp(-((x-v(1))./lvar).^2.);
+%kernel= @(v,x) exp(-abs((x-v(1)))./lvar );
+%kernel= @(v,x) exp(-((x-v(1))./var).^4.);
+%kernel=@(v,x) 1./(1+ ((x-v(1)).^2)./lvar);
+
+kstart=diag' ;
+
+Ws=ones(length(diag),1); 
+if(pts==0)
+pts=DiscreteApproximationBase(L0,0.000001,-5,5);
+end
+
+Laws=ShredWithKernelWishfully(L0, diag', Ws,pts,kernel,kstart);
+
+TestMixture(L0,Laws,Ws,10,50);
+pdflen=max(abs(diag))/p + 4 ;
 
 
 %Matrice de lois
@@ -82,12 +92,13 @@ end
 
 for i=1:(d)
 	L1{i,i}=Laws{i};
+ %   L1{i,1+mod(i,d)}=Laws{i};
 end
 
 
 
 % taille de la série temporelle
-n=10000;
+n=5000;
 
 Law1=matrixLaw(A, E , L1 , n);
 
@@ -100,7 +111,7 @@ coeffs=CircularEigenCoeffs(M1)
 x1=Law1.rv();
 
 figure(4); clf;
-plot(x1(1:(5*len)));
+plot(x1);
 
 figure(5);clf
 xpos= (-pdflen):0.1:pdflen;
@@ -111,13 +122,13 @@ var= Law1.variance();
 xc = xcov(x1,'coeff') ;
 xc=xc((n+1):end);
 
-xctheor=zeros(1,len);
-for t=1:len
+xctheor=0*x1;
+for t=1:length(x1)
 	xctheor(t)=CircularCov(lambdas,coeffs,t);
 end
 
 xctheor=xctheor./var;
  
 figure(6) ; clf 
-plot(xc(1:len) ) ;  grid on; hold on;
+plot(xc ) ;  grid on; hold on;
 plot(xctheor, 'r--');

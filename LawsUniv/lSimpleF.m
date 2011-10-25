@@ -1,5 +1,5 @@
 classdef lSimpleF
-    %lSimpleF Lois à cumulatives constantes par morceau
+    %lSimpleF Lois à densité de probabilités constantes par morceau
    
     
     properties

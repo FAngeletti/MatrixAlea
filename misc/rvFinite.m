@@ -1,4 +1,7 @@
 function i=rvFinite(v)
+%rvFinite(ws) Randomly choose an integer with probabilities distribution
+%P( i=ws(i) ).
+% Normalize the input ws.
 n=length(v);
 p=cumsum(v);
 p=p./p(n);

@@ -37,11 +37,12 @@ classdef matrixLawNS
             x=zeros(nt,1);
             [state,sink]=obj.initie();
           %  CurrentT=obj.E^nt;
+          fMLaw=obj.Laws;
             for i=1:(nt)
                CurrentT=obj.E^(nt-i);
                 newState=rvFinite( obj.E(state,:).* CurrentT(:,sink)' );
      %           fprintf(1,'Time %d : %d -> %d \n', i, state,newState); 
-                MLaw=obj.Laws(i);
+                MLaw=fMLaw(i);
                 Law=MLaw{state,newState};
                 x(i)=Law.rv();
                 state=newState;
