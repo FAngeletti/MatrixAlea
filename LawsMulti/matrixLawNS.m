@@ -61,6 +61,16 @@ classdef matrixLawNS
         y=this.matproj(1:this.n,m);
     end
     
+    function y=mvPartialPdf(this,pos,v)
+    %L.mvpdf(v) partial multivariate pdf at vector v at point pos 
+        nv=length(pos);
+        m=cell(nv,1);
+        for i=1:nv
+            m{i}=this.matInterm(@(L) L.pdf(v(i)),pos(i) );
+        end
+        y=this.matproj(pos,m);
+    end
+    
     
 	function y=pdf(this,x,pos)
     %L.pdf(x,pos) pdf of the k-marginal at point x

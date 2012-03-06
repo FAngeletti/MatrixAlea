@@ -1,4 +1,4 @@
-
+% Définition des lois par coupure
 
 clear all
 close all

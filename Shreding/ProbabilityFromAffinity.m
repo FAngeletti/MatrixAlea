@@ -1,4 +1,4 @@
-function  [Pr,mu]= ProbabilityFromAffinity( Aff, widths, p ,Ws,mu)
+function  [Pr,mu]= ProbabilityFromAffinity( Aff, widths, p ,Ws,mu,eps)
 %ProbilityFromAffinity(Aff, widths, p ,Ws) Calculate the normalised probability from
 %Affinity
 %   Aff :positive nL*nPts matrice . nL number of shreds, nPts number of control points.
@@ -35,9 +35,10 @@ wm=zeros(nl,1);
         er=wm-Ws;
     end
 
-options=optimset('Display','off');
+options=optimset('Display','off','TolFun', eps);
 mu=abs(fsolve(@errorfun, mu,options));
 
+%mu=wishfulOptimisation4(@errorfun,100,1e-7,mu,0);
 
 for j=1:nl
 Pr(j,:)=mu(j).*p.*Aff(j,:) ./ affw;

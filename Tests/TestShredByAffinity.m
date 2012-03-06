@@ -1,14 +1,14 @@
 % Définition de la loi parente
-Parent=lnormal(0,1);
+Parent=lgamma(2,1);
 
 %Nombre de lois
-nL=10;
+nL=2;
 
 % Poids associé à chaque lois
 Ws=ones(nL,1);
 
 %Définitions des points de contrôle
-nps=1000;
+nps=5000;
 pts=vRandL(Parent,nps);
 %pts=[-2,-1,0.5,0.75,1,2];
 

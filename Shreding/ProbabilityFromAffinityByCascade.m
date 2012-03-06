@@ -1,4 +1,4 @@
-function  [Pr,mu]= ProbabilityFromAffinityByCascade( Aff, widths, p ,Ws,mu)
+function  [Pr,mu]= ProbabilityFromAffinityByCascade( Aff, widths, p ,Ws,mu,eps)
 %ProbilityFromAffinity(Aff, widths, p ,Ws) Calculate the normalised probability from
 %Affinity
 %   Aff :positive nL*nPts matrice . nL number of shreds, nPts number of control points.
@@ -14,7 +14,7 @@ function  [Pr,mu]= ProbabilityFromAffinityByCascade( Aff, widths, p ,Ws,mu)
 s=size(Aff);
 nl=s(1);
 Pr=zeros(s);
-
+eps=0.00001;
 for it=1:(nl-1)
     P=sum(p.*widths); %disp(P);
     AffStar= sum(Aff((it+1):end,1:end),1);    
@@ -22,8 +22,10 @@ for it=1:(nl-1)
     target=P-Ws(it); %fprintf(1,'target=%f\n',target); 
     f=@(x) sum( (p.*AffStar.*widths) ./ (x .* AffSel + AffStar) ) -target;
 
+
     bsup=(P/target-1)*max(AffStar./AffSel);
-    mu(it)=fzero(f,[0 bsup]); %fprintf(1,'Step %d : mu=%f\n', it, mu(it));
+    
+    mu(it)=fzero(f,[eps bsup]); %fprintf(1,'Step %d : mu=%f\n', it, mu(it));
     
     tmp=(mu(it)*AffSel+ AffStar);
     Pr(it,:)= (mu(it)*AffSel.* p) ./tmp; 

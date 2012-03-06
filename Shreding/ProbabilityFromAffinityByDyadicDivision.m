@@ -1,4 +1,4 @@
-function  [Pr,mu]= ProbabilityFromAffinityByDyadicDivision( Aff, widths, p ,Ws,mu)
+function  [Pr,mu]= ProbabilityFromAffinityByDyadicDivision( Aff, widths, p ,Ws,mu,eps)
 %ProbilityFromAffinityByDyadic(Aff, widths, p ,Ws) Calculate the normalised probability from
 %Affinity
 %   Aff :positive nL*nPts matrice . nL number of shreds, nPts number of control points.

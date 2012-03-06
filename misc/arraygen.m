@@ -1,19 +1,18 @@
-function C= cellgen( f, sh )
-%cellgen(f,sh) Create a cell C of shape sh, where C{i}=f(i); 
-
+function A= arraygen( f, sh )
+%arraygen(f,sh) Create an array A of shape sh, where C(i)=f(i); 
 
 dim=length(sh);
 if(dim==1)
-    C=cell(dim,1);
+    A=zeros(dim,1);
 else
-    C=cell(sh);
+A=zeros(sh);
 end
 
 indice=init(dim);
 
 len =prod(sh);
 for i=1:len
-    C{indice{:}}=f(indice{:});
+    A(indice{:})=f(indice{:});
     indice=incr(sh,indice);
 end
 

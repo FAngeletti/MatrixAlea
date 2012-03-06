@@ -1,5 +1,5 @@
 function Laws = ShredWithKernelWishfully(L , moments, Ws0, pts0, Kern, Kstart )
-%ShredWithKernelWishfully(L , orders, momentsTarget, Ws, pts0, Kern, Kstart ) Try to
+%ShredWithKernelWishfully(L , momentsTarget, Ws, pts0, Kern, Kstart ) Try to
 %shred the law L into shred Laws of weigths Ws such that E Laws{i} ^ q = moments(i,q),
 %using control point pts and the kernel Kern starting with kernel
 %parameters Kstart.
@@ -58,7 +58,7 @@ precompQ(q,:)= diff(pts.^(1+q))./(q+1);
 end
 cmoments=centerMoments(moments);
 mu=ones(nL,1);
-
+intEps=1e-9;
 % Definition of the function to be optimised
     function fitness=Optim(Params)
 %Construction of the affinity matrice
@@ -66,9 +66,10 @@ mu=ones(nL,1);
             Aff(j,:) = Kern(Params(j,:), center);
         end
 	
-      %[Pr,mu]=ProbabilityFromAffinityByDyadicDivision(Aff, larg, p, Ws,mu) ;
-      [Pr,mu]=ProbabilityFromAffinityByCascade(Aff, larg, p, Ws,mu) ;
-     
+        
+     %[Pr,mu]=ProbabilityFromAffinityByDyadicDivision(Aff, larg, p, Ws,mu,intEps) ;
+     % [Pr,mu]=ProbabilityFromAffinityByCascade(Aff, larg, p, Ws,mu,intEps) ;
+     [Pr,mu]=ProbabilityFromAffinity(Aff,larg,p,Ws,mu,intEps);
   
 
       for qi=1:dimM

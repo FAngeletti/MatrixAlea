@@ -1,5 +1,8 @@
 addpath /Users/pabry/MATLAB/UTILS_STAT/
 
+% Même corrélation (non-nulle)
+% Corrélation carré différente
+
 %Dimension de la matrice
 d=8;
 
@@ -17,7 +20,7 @@ A=ones(d);
 L=lnormal(0,1);
 
 %Points de contrôles
-pts=-5:0.01:5;
+pts=-5:0.001:5;
 
 %Poids
 Ws=ones(4,1);
@@ -86,7 +89,7 @@ end
 E= p.*Id+q.*(J) ;
 
 % taille de la série temporelle
-n=10000;
+n=500000;
 
 Law1=matrixLaw(A, E , L1 , n);
 Law2=matrixLaw(A,E,L2,n);

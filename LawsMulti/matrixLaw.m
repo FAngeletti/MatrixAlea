@@ -49,14 +49,17 @@ classdef matrixLaw
 	end
 
 	function [source,sink]=initie(obj)
+    % L.initie() choose an initial state    
 		nt=obj.n;      
-		v=reshape(obj.A.*(obj.E^nt),obj.d*obj.d,1);
+        dt=obj.d;
+		v=reshape(obj.A.*(obj.E^nt),dt^2,1);
+      %  disp('Flat init vect'); disp(v); disp('n');
 		nt=rvFinite(v);
-		source=1+floor((nt-1)/obj.d);
-		sink=1+mod(nt-1,obj.d);
+     %   fprintf(1, 'Chosen flat state %d\n',nt); 
+		sink=1+fix((nt-1)/dt);
+		source=1+mod(nt-1,dt);
 
-	end  
-
+    end
   
         
         function x=rv(obj)

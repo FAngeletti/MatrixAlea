@@ -1,4 +1,4 @@
-addpath /Users/patriceabry/MATLAB/UTILS_STAT/
+addpath /Users/pabry/MATLAB/UTILS_STAT/
 
 clear all
 close all
@@ -10,10 +10,35 @@ n=10000 ;
 p=0.98;
 q=1-p ;
 
-% Lois de bases
-Lp=lnormal(0,2);
-Lm=lnormal(0,0.5);
+%Loi de base
+% L=lnormal(0,1);
+ L=lLaplace(1/sqrt(2));
 
+%Points de contrôles
+pts=-5:0.01:5;
+
+%Poids
+Ws=[1;1]
+
+%%Fonctions d'affinités
+%f=@(x) exp(-0.25*(x.*x));
+%g=@(x) exp( -(x.^2-2.5).^2);
+%funAff={f g};
+%% Définition des lois sectionnées
+%Ls= ShredByAffinity(L, pts, Ws, funAff);
+
+%Noyau
+kernel=@(v,x) exp(-abs((x-v(1))./v(2)));
+%Moments ciblés
+tmoments=[0 0.2; 0 1.8 ];
+% Point de départ des paramètres du noyau
+kstart=tmoments
+% Définition des lois sectionnées
+Ls=ShredWithKernelWishfully(L , tmoments, Ws , pts, kernel, kstart);
+
+
+Lm=Ls{1};
+Lp=Ls{2};
 
 %Dimension de la matrice
 d=6;
@@ -82,25 +107,19 @@ figure(2); clf;
 plot(x2,'k'); grid on 
 set(gca,'FontSize',fontsize) 
 % h(1) = ylabel('Y') ; 
-h(1) = ylabel('Data') ; 
-h(2) = title('Y') ; 
+h(1) = title('Y') ; 
 set(h,'FontSize',fontsize) ; 
 
 %%  pdf
 
 [hh,bh,gh1]=hist1d(x1,50);
 pdftheo=Law1.pdf(bh);
-pdftheoH1=Lp.pdf(bh)./2;
-pdftheoH2=Lm.pdf(bh)./2;
-
 % figure(3) ; clf 
 %   plot(bh,hh,'k'); hold on ; grid on ; 
 %   plot(bh,pdftheo,'--') ; 
   
   figure(3) ; clf 
-  plot(bh,pdftheo(:,1),'b','LineWidth',linewidth,'MarkerSize',markersize);grid on; hold on;
-  plot(bh,pdftheoH1,'b--','LineWidth',linewidth,'MarkerSize',markersize);
-  plot(bh,pdftheoH2,'b--','LineWidth',linewidth,'MarkerSize',markersize);
+  plot(bh,pdftheo(:,1),'b--','LineWidth',linewidth,'MarkerSize',markersize);grid on; hold on;
 plot(bh,hh,'k','LineWidth',linewidth,'MarkerSize',markersize ) ;  
 set(gca,'FontSize',fontsize) 
 axis([-7 7 0 0.55])
@@ -116,20 +135,14 @@ set(h,'FontSize',fontsize) ;
   
 [hh,bh,gh1]=hist1d(x2,100);
 pdftheo=Law2.pdf(bh);
-pdftheoH1=Lp.pdf(bh)./2;
-pdftheoH2=Lm.pdf(bh)./2;
 
 %  plot(bh,hh,'b');
 %  plot(bh,pdftheo,'g--') ; 
 figure(4) ; clf 
-plot(bh,pdftheo(:,1),'r','LineWidth',linewidth,'MarkerSize',markersize);grid on; hold on;
-  plot(bh,pdftheoH1,'r--','LineWidth',linewidth,'MarkerSize',markersize);
-  plot(bh,pdftheoH2,'r--','LineWidth',linewidth,'MarkerSize',markersize);
+plot(bh,pdftheo(:,1),'r--','LineWidth',linewidth,'MarkerSize',markersize);grid on; hold on;
 plot(bh,hh,'k','LineWidth',linewidth,'MarkerSize',markersize ) ;  
 set(gca,'FontSize',fontsize) 
 axis([-7 7 0 0.55])
-h(1) = ylabel('Marginal') ; 
-set(h,'FontSize',fontsize) ; 
 % h(1) = ylabel('Marginal') ; 
 % set(h,'FontSize',fontsize) ; 
 
@@ -160,8 +173,8 @@ figure(5) ; clf
 plot(xc(1:len),'k-','LineWidth',linewidth,'MarkerSize',markersize ) ;  grid on; hold on;
 plot(ytheo1,'b--','LineWidth',linewidth,'MarkerSize',markersize);
 axis(V) 
-h(1) = xlabel('lag \tau') ; 
-h(2) = ylabel('Corr X(\tau) X(0)') ; % h(3) = title(name) ; 
+%h(1) = xlabel('lag \tau') ; 
+h(1) = ylabel('Corr X(\tau) X(0)') ; % h(3) = title(name) ; 
 set(h,'FontSize',fontsize) ; 
 set(gca,'FontSize',fontsize) ;
 
@@ -170,9 +183,9 @@ figure(6); clf
 plot(xc2(1:len),'k-' ,'LineWidth',linewidth,'MarkerSize',markersize) ;  grid on; hold on;
 plot(ytheo2,'r--','LineWidth',linewidth,'MarkerSize',markersize);
 axis(V) 
-h(1) = xlabel('lag \tau') ; 
-h(2) = ylabel('Corr Y(\tau) Y(0)') ; % h(3) = title(name) ; 
- set(h,'FontSize',fontsize) ; 
+% h(1) = xlabel('lag \tau') ; 
+% h(2) = ylabel('Corr X(\tau) X(0)') ; % h(3) = title(name) ; 
+% set(h,'FontSize',fontsize) ; 
 set(gca,'FontSize',fontsize) 
 
 xcq = xcov(x1.^2,'coeff') ;
@@ -213,7 +226,7 @@ plot(xcq2(1:len),'k-' ,'LineWidth',linewidth,'MarkerSize',markersize) ;  grid on
 plot(yqtheo2,'r--','LineWidth',linewidth,'MarkerSize',markersize);
 axis(V) 
 h(1) = xlabel('lag \tau') ; 
-h(2) = ylabel('Corr Y^2(\tau) Y^2(0)') ; % h(3) = title(name) ; 
+% h(2) = ylabel('Corr X^2(\tau) X^2(0)') ; % h(3) = title(name) ; 
 set(h,'FontSize',fontsize) ; 
 set(gca,'FontSize',fontsize) 
 
@@ -224,9 +237,9 @@ set(gca,'FontSize',fontsize)
 
 printfig = 0 ; 
 %printpath = '/Users/patriceabry/TEXTES/PUBLIS/COURANT/12PUBLIS/12ICASSP/12PRODUCT/FIGTMP/' ;
- printpath ='figs/mixture/' ; 
+ printpath ='../figs/' ; 
 name = 'ExB' ; 
- printfig = 1 ; 
+
 suffixes={ '_TS1' ; '_TS2'; '_PDF1';'_PDF2'; '_Cov1';'_Cov2'; '_SqCov1'; '_SqCov2' };
 suffixes=cellfun( @(s) [s '.eps'], suffixes, 'UniformOutput', false);
 if printfig == 1
