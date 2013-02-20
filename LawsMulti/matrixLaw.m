@@ -14,6 +14,12 @@ classdef matrixLaw
     methods
         
         function obj=matrixLaw(A,E,Laws,n)
+            %matrixLaw(A,E,Laws,n) Crée une loi matricielle non-stationnaire
+            %  A : vecteur dual de L : L(M) =tr( A' M);
+            %  E : matrice de structure : définit la forme du graphe
+            %  markovien
+            %  Laws : Une cellule de lois 
+            %  n  :taille du signal. 
 	   [dtmp,nihil]=size(E);
 	   obj.d=dtmp;
            obj.E=E;

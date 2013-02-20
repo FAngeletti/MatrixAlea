@@ -1,5 +1,5 @@
 function Laws = ShredWithKernel(L , moments, Ws0, pts0, Kern, Kstart )
-%ShredWithKernelWishfully(L , momentsTarget, Ws, pts0, Kern, Kstart ) Try to
+%ShredWithKernel(L , momentsTarget, Ws, pts0, Kern, Kstart ) Try to
 %shred the law L into shred Laws of weigths Ws such that E Laws{i} ^ q = moments(i,q),
 %using control point pts and the kernel Kern starting with kernel
 %parameters Kstart.
