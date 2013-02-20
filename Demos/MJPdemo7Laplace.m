@@ -34,7 +34,7 @@ tmoments=[0 0.2; 0 1.8 ];
 % Point de départ des paramètres du noyau
 kstart=tmoments
 % Définition des lois sectionnées
-Ls=ShredWithKernelWishfully(L , tmoments, Ws , pts, kernel, kstart);
+Ls=ShredWithKernel(L , tmoments, Ws , pts, kernel, kstart);
 
 
 Lm=Ls{1};

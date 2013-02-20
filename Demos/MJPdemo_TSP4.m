@@ -1,66 +1,75 @@
-addpath /Users/patriceabry/MATLAB/UTILS_STAT/
+addpath /Users/pabry/MATLAB/UTILS_STAT/
+% remplace marginale gaussienne par marginale student
 
 % Correlation nulle
 % Correlation d'ordre 2 distincte.
 
 clear all
-close all
+% close all
 
 % taille de la série temporelle
-n=40000 ;
-nr=10000;
+n = 40000 ;
+nr= 10000;
 
 %Matrice de structure
-p=0.98;
+p=0.99;
 q=1-p ;
 
 %Loi de base
-L=lnormal(0,1);
+Lmarg=lLaplace(1);
 
 %Points de contrôles
-pts=-5:0.01:5;
+pts=-10:0.04:10;
+
+%Dimension de la matrice E
+d=6;
 
 %Poids
-Ws=[1;1;1;1]
+Ws=ones(d,1);
 
-%%Fonctions d'affinités
-%f=@(x) exp(-0.25*(x.*x));
-%g=@(x) exp( -(x.^2-2.5).^2);
-%funAff={f g};
-%% Définition des lois sectionnées
-%Ls= ShredByAffinity(L, pts, Ws, funAff);
 
 %Noyau
-kernel=@(v,x) exp(-abs((x-v(1))./v(2)));
-%Moments ciblés
-mn=-0.35;
-mp=-mn;
-sl=0.3;
-sh=2-sl
-
-tmoments=[mn sl;mn sh;mp sl;mp sh];
-% Point de départ des paramètres du noyau
-kstart=tmoments;
-% Définition des lois sectionnées
-Ls=ShredWithKernel(L , tmoments, Ws , pts, kernel, kstart);
+ kernel=@(v,x) exp(-abs((x-v(1))./v(2)));
+%kernel=@(v,x) exp(-(x-v(1)).^2./v(2));
 
 
 
 
-Lmm=Ls{1};
-Lmp=Ls{2}
-Lpm=Ls{3}
-Lpp=Ls{4};
 
-%Dimension de la matrice
-d=8;
 
-% affichage
-len = 300 ; 
-V = [0 len -0.1 1] ; 
-fontsize = 18 ;  fontsize2 = 15 ; 
-markersize = 5 ; markersize2 = 5 ; 
-linewidth = 2 ; 
+% Réglage de la correlation
+% Moyenne de la distribution stationnaire
+mu=Lmarg.moments(1);
+%Amplitude de la correlation
+c1=0.1;
+%Matrice Dq(1)
+D{1} = arraygen(@(n) sqrt(2*c1)*cos(pi*n), [d]);
+
+% Réglage de la correlation des carrés
+% Moment d'ordre 2 de la distribution stationnaire
+mom2=Lmarg.moments(2)
+
+%Amplitude de la correlation
+c2=1.5*mom2
+c3=3.5*mom2
+%Matrice Dq(2) pour X
+D{2}{1} = arraygen(@(n) sqrt(c2)*cos(2*pi*n/d), [d])
+%Matrice Dq(2) pour Y
+D{2}{2} = arraygen(@(n) sqrt(c3)*cos(4*pi*n/d), [d])
+
+
+for k=1:2
+
+
+	tmoments{k}= [(D{1}+mu)' (D{2}{k}+mom2)']
+
+	% Point de départ des paramètres du noyau
+	kstart=tmoments{k};
+	% Définition des lois sectionnées
+	Ls{k}=ShredWithKernel(Lmarg , tmoments{k}, Ws , pts, kernel, kstart);
+
+end
+
 
 %Définition de l'opérateur de projection L(M) = <A,M> 
 A=ones(d);
@@ -79,26 +88,17 @@ end
 %matrice de structure 
 E=p*Id+q*J;
 
-L2=cell(d,d);
-L1=cell(d,d);
+L{2}=cell(d,d);
+L{1}=cell(d,d);
 
-diag1={Lpp,Lmp,Lpm,Lmm,Lpp,Lmp,Lpm,Lmm};
-diag2={Lpp,Lmp,Lpp,Lmp,Lpm,Lmm,Lpm,Lmm};
-
-
-%Matrice de lois
-L2=cell(d,d);
-
+%Matrice des lois
+for k=1:2
 for i=1:d
-		L2{i,i}=diag2{i};
-     		L2{i,1+mod(i,d)}=diag2{i};
-		L1{i,i}=diag1{i};
-		L1{i,1+mod(i,d)}=diag1{i};
-
+		L{k}{i,i}=Ls{k}{i};
+     		L{k}{i,1+mod(i,d)}=Ls{k}{i};
 end
-
-Law{1}=matrixLaw(A,E,L1,n);
-Law{2}=matrixLaw(A,E,L2,n);
+Law{k}= matrixLaw(1,E,L{k},n);
+end
 
 
 %lambdas=CircularEigenValues(E);
@@ -106,8 +106,21 @@ Law{2}=matrixLaw(A,E,L2,n);
 %coeffs1= CircularEigenCoeffs(Law1.matMq(2))
 %coeffs2= CircularEigenCoeffs(Law2.matMq(2))
 
+
+
+% affichage
+len = 300 ; 
+V = [0 len -0.1 1] ; 
+fontsize = 18 ;  fontsize2 = 15 ; 
+markersize = 5 ; markersize2 = 5 ; 
+linewidth = 2 ; 
+
 nfig=1;
 colors={'r','b'};
+
+
+
+
 
 for(k=1:2)
 x=Law{k}.rv();
@@ -124,7 +137,7 @@ splot= @(x,s) plot(x,s,'LineWidth',linewidth,'MarkerSize',markersize);
 
 %%  pdf
 
-[hh,bh,gh1]=hist1d(x,50);
+[hh,bh,gh1]=hist1d(x,100);
 pdftheo=Law{k}.pdf(bh);
 % figure(3) ; clf 
 %   plot(bh,hh,'k'); hold on ; grid on ; 
@@ -134,14 +147,13 @@ pdftheo=Law{k}.pdf(bh);
   figure(nfig) ; clf; nfig=nfig+1; 
   oplot(bh,pdftheo(:,1), dash);grid on; hold on;
   oplot(bh,hh,'k') ;
-  oplot(bh, Lmm.pdf(bh)./4, solid);
-  oplot(bh, Lmp.pdf(bh)./4, solid);
-  oplot(bh, Lpm.pdf(bh)./4, solid);
-  oplot(bh, Lpp.pdf(bh)./4, solid);
+  for i=1:d
+  oplot(bh, Ls{k}{i}.pdf(bh)./d, solid);
+  end
   
 set(gca,'FontSize',fontsize) 
-axis([-7 7 0 0.55])
-h(1) = ylabel('Marginal') ; 
+%axis([-7 7 0 0.55])
+%h(1) = ylabel('Marginal') ; 
 set(h,'FontSize',fontsize) ; 
 
 % plot(bh,pdftheo(:,1),'r--','LineWidth',linewidth,'MarkerSize',markersize);
@@ -175,7 +187,7 @@ splot(xc(1:len),'k-') ;  grid on; hold on;
 splot(ytheo,dash);
 axis(V) 
 %h(1) = xlabel('lag \tau') ; 
-h(1) = ylabel('Corr X(\tau) X(0)') ; % h(3) = title(name) ; 
+%h(1) = ylabel('Corr X(\tau) X(0)') ; % h(3) = title(name) ; 
 set(h,'FontSize',fontsize) ; 
 set(gca,'FontSize',fontsize) ;
 
@@ -204,8 +216,8 @@ figure(nfig); clf; nfig=nfig+1;
 splot(xcq(1:len),'k-' ) ;  grid on; hold on;
 splot(yqtheo,dash);
 axis(V) 
-h(1) = xlabel('lag \tau') ; 
-h(2) = ylabel('Corr X^2(\tau) X^2(0)') ; % h(3) = title(name) ; 
+%h(1) = xlabel('lag \tau') ; 
+%h(2) = ylabel('Corr X^2(\tau) X^2(0)') ; % h(3) = title(name) ; 
 set(h,'FontSize',fontsize) ; 
 set(gca,'FontSize',fontsize) 
 end

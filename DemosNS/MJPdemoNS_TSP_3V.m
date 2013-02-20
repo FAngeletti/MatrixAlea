@@ -68,12 +68,12 @@ Tmoments= ATmoments{tmom};
 Kstart=AKstart{tmom};
 
 
-% À partir de ces données ShredWithKernelWishfully construit les nL{i} sous lois
+% À partir de ces données ShredWithKernel construit les nL{i} sous lois
 % associés aux nP lois parentes.
 % Laws{i}{k} correspond à la k-ème sous-lois associés à la i-ème loi
 % parente
 
-Laws=cellgen( @(i) ShredWithKernelWishfully(Parents{i} , Tmoments{i}, Ws{i}, pts{i}, kernel, Kstart{i} ), nP) ;
+Laws=cellgen( @(i) ShredWithKernel(Parents{i} , Tmoments{i}, Ws{i}, pts{i}, kernel, Kstart{i} ), nP) ;
 
 for i=1:nP
 path= sprintf('figs/V3/updf%d_%d_kern%d.eps',i,tmom,kern);    

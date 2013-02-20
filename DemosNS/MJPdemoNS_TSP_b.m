@@ -48,7 +48,7 @@ Tmoments=ATmoments{ik};
 % Tmoments{k}(l,q) doit correspondre au q-ème moment de la sous-loi l de la loi parente k.
 % Attention! La somme des moments partiels doit rester égale au moment de la loi parente.
 % De plus, les bornes présentés, ci-haut sont très proches des bornes maximales. Les dépasser empêchera
-% probablement Shred...Wishfully de converger. 
+% probablement ShredWithKernel de converger. 
 
 
 %En première approximation, on considère que les centres des noyaux devraient être proche des moments choisi
@@ -60,7 +60,7 @@ Kstart=AKstart{ik};
 % Laws{i}{k} correspond à la k-ème sous-lois associés à la i-ème loi
 % parente
 
-Laws=cellgen( @(i) ShredWithKernelWishfully(Parents{i} , Tmoments{i}, Ws{i}, pts{i}, kernel, Kstart{i} ), nP) ;
+Laws=cellgen( @(i) ShredWithKernel(Parents{i} , Tmoments{i}, Ws{i}, pts{i}, kernel, Kstart{i} ), nP) ;
 
 printf=@(s) @() print('-depsc', s);
 printing= @(s) print('-depsc', s);

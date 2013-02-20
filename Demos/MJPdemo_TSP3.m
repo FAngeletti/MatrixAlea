@@ -1,24 +1,26 @@
-addpath /Users/patriceabry/MATLAB/UTILS_STAT/
+addpath /Users/pabry/MATLAB/UTILS_STAT/
+% remplace marginale gaussienne par marginale student
 
 % Correlation nulle
 % Correlation d'ordre 2 distincte.
 
 clear all
-close all
+% close all
 
 % taille de la série temporelle
-n=40000 ;
-nr=10000;
+n = 40000 ;
+nr= 10000;
 
 %Matrice de structure
-p=0.98;
+p=0.99;
 q=1-p ;
 
 %Loi de base
-L=lnormal(0,1);
+% L=lnormal(0,1);
+nu = 5.0 ; L = lstudent(0,1,nu) ;
 
 %Points de contrôles
-pts=-5:0.01:5;
+pts=-8:0.02:8;
 
 %Poids
 Ws=[1;1;1;1]
@@ -31,24 +33,23 @@ Ws=[1;1;1;1]
 %Ls= ShredByAffinity(L, pts, Ws, funAff);
 
 %Noyau
-kernel=@(v,x) exp(-abs((x-v(1))./v(2)));
+% kernel=@(v,x) exp(-abs((x-v(1))./v(2)));
+kernel=@(v,x) exp(-(x-v(1)).^2./v(2));
 %Moments ciblés
-mn=-0.35;
+% mn=-0.2; sl=1.8;
+mn = 0 ; sl=0.18; % fct de Corr nulle
 mp=-mn;
-sl=0.3;
-sh=2-sl
+sh=2*L.moments(2)-sl
 
-tmoments=[mn sl;mn sh;mp sl;mp sh];
+tmoments=[mn sh;mn sl;mp sl;mp sh];
 % Point de départ des paramètres du noyau
 kstart=tmoments;
 % Définition des lois sectionnées
 Ls=ShredWithKernel(L , tmoments, Ws , pts, kernel, kstart);
 
 
-
-
-Lmm=Ls{1};
-Lmp=Ls{2}
+Lmm=Ls{2};
+Lmp=Ls{1}
 Lpm=Ls{3}
 Lpp=Ls{4};
 
@@ -124,7 +125,7 @@ splot= @(x,s) plot(x,s,'LineWidth',linewidth,'MarkerSize',markersize);
 
 %%  pdf
 
-[hh,bh,gh1]=hist1d(x,50);
+[hh,bh,gh1]=hist1d(x,100);
 pdftheo=Law{k}.pdf(bh);
 % figure(3) ; clf 
 %   plot(bh,hh,'k'); hold on ; grid on ; 
@@ -216,7 +217,7 @@ end
 % set(gca,'XTick',[1:1:jj]) ; 
 % set(gca,'XTickLabel',2.^[1:1:jj]) ;
 
-printfig = 1 ; 
+printfig = 0 ; 
 %printpath = '/Users/patriceabry/TEXTES/PUBLIS/COURANT/12PUBLIS/12ICASSP/12PRODUCT/FIGTMP/' ;
  printpath ='figs/' ; 
 name = 'ExB' ; 

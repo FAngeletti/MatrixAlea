@@ -34,12 +34,12 @@ Tmoments= { [-1.4;-0.7;-0.5;-0.2;0.2;0.5;0.7;1.4], [0.7;1.;1.3;1.6;1.9;2.5;3.;4]
 Kstart=Tmoments;
 
 
-% À partir de ces données ShredWithKernelWishfully construit les nL{i} sous lois
+% À partir de ces données ShredWithKernel construit les nL{i} sous lois
 % associés aux nP lois parentes.
 % Laws{i}{k} correspond à la k-ème sous-lois associés à la i-ème loi
 % parente
 
-Laws=cellgen( @(i) ShredWithKernelWishfully(Parents{i} , Tmoments{i}, Ws{i}, pts{i}, kernel, Kstart{i} ), nP) ;
+Laws=cellgen( @(i) ShredWithKernel(Parents{i} , Tmoments{i}, Ws{i}, pts{i}, kernel, Kstart{i} ), nP) ;
 
 
 %% Définition de E

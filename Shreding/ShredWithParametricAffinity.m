@@ -1,4 +1,4 @@
-function Laws = ShredWithParametricAffinityWishfully(L , moments, Ws0, pts0, Kerns, Kstart )
+function Laws = ShredWithParametricAffinity(L , moments, Ws0, pts0, Kerns, Kstart )
 %ShredWithKernelWishfully(L , orders, momentsTarget, Ws, pts0, Kern, Kstart ) Try to
 %shred the law L into shred Laws of weigths Ws such that E Laws{i} ^ q = moments(i,q),
 %using control point pts and the kernel Kern starting with kernel
@@ -13,7 +13,7 @@ sM=size(moments);
 dimM=sM(2);
 
 if( sM(1) ~= nL )
-	error('MJP:IncoherentWish', sprintf( 'Required moments for %d laws, however the kernel initial parameters provides parameter for %d laws',sM(1), nL) );
+	error('MJP:IncoherentRequest',  'Required moments for %d laws, however the kernel initial parameters provides parameter for %d laws',sM(1), nL );
 end
 
 if(dimK<dimM)
@@ -23,7 +23,7 @@ end
 for q=1:dimM
     Mt=sum(Ws.*moments(:,q));
     if( abs(Mt-L.moments(q)) >4*eps )
-        error('MJP:ImpossibleWish', sprintf('Required moments (sum %d) are incoherent with the parent law (%f)',Mt,L.moments(q) ));
+        error('MJP:ImpossibleRequest','Required moments (sum %d) are incoherent with the parent law (%f)',Mt,L.moments(q) );
     end
 end
 
@@ -86,7 +86,7 @@ epsS1=1e-3;
 epsT=1e-6;
 options=optimset('Tolfun',epsT, 'TolX',1e-8);
 
-[param,err]=wishfulOptimisation2(@Optim,100, epsT, param);
+[param,err]=wAdhocOptimisation2(@Optim,100, epsT, param);
 %[param,err]=fsolve(@(x) reshape(Optim(x),dimM*nL,1), param,options);
 
 disp('param:');

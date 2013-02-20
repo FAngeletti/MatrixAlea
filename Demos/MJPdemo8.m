@@ -74,7 +74,7 @@ if(pts==0)
 pts=DiscreteApproximationBase(L0,0.000001,-5,5);
 end
 
-Laws=ShredWithKernelWishfully(L0, diag', Ws,pts,kernel,kstart);
+Laws=ShredWithKernel(L0, diag', Ws,pts,kernel,kstart);
 
 TestMixture(L0,Laws,Ws,10,50);
 pdflen=max(abs(diag))/p + 4 ;
