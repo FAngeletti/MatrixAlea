@@ -1,5 +1,3 @@
-addpath /Users/patriceabry/MATLAB/UTILS_STAT/
-
 clear all
 close all
 
@@ -11,8 +9,8 @@ p=0.98;
 q=1-p ;
 
 % Lois de bases
-Lp=lnormal(0,2);
-Lm=lnormal(0,0.5);
+Lp=lNormal(0,2);
+Lm=lNormal(0,0.5);
 
 
 %Dimension de la matrice

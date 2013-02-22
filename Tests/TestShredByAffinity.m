@@ -1,5 +1,5 @@
 % Définition de la loi parente
-Parent=lgamma(2,1);
+Parent=lGamma(2,1);
 
 %Nombre de lois
 nL=2;

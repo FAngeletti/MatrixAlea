@@ -1,7 +1,7 @@
 #Presentation 
 
 This matlab package gathers a set of functions and subroutines for the synthesis and analysis of random variables
-with matrix representation. In brief, The joint probability density of these random variables
+with matrix representation. In brief, the joint probability density of these random variables
 can be expressed as 
 p(x_1, ..., x_n) = L (R_n(x_1 ).. R_n(x_n) ) / Z 
 where R is a positive matrix function and L is a linear form on the space of matrices.
@@ -26,14 +26,16 @@ The core of this package are the class "matrixLaw" and "matrixLawNS" found in th
 ### Homogeneous Matrix laws
 In order to create a random variable with matrix variables, one needs to use
 ```matlab
-mL= matrixLaw(A,E,Laws,n)
+% matrix Law
+mL= matrixLaw(A,E,Laws,n);
 ```
+
 In the previous code fragment, 
 * 'A' is a positive positive matrix which corresponds to the dual vector of L, i.e. L(M)=tr( A^T E).
 * 'E' is a positive matrix which corresponds to the integral of the matrix R_n(x). 
 * 'Laws' is a 2-dimensionnal cell of laws.
 
-For more details, see the tutorial/Start.m.
+For more details, see the tutorial/tMatrixLaw.m.
 
 ### Inhomogeneous matrix laws
 The inhomogeneous case looks quite similar to the homogeneous case 
@@ -41,7 +43,7 @@ The inhomogeneous case looks quite similar to the homogeneous case
 mL= matrixLawNS(A,E,fLaws,n)
 ```
  except that fLaws must be a function such that fLaws(k) is the cells of laws at
-the time k.
+the time k. For more informations, see the tutorial/tMatrixLawNS.m.
 
 ## Laws shreding
 In typical utilisation, it is more practical to generate random variables with prescribed
@@ -61,6 +63,8 @@ subLaws = ShredWithKernel(L , moments, Ws0, pts0, Kern, Kstart )
 * pts0 is a vector containing the discretization points which would be used for the constructions of the sub-laws L
 * Kern is the kernel function, such that Kern(param) is a real endofunction.
 * Kstart is the starting parameters for the kernel function
+
+The script 'tutorial/tShred' contains an example of utilisation of this function 
 
 ## Synthesis with constraints
 

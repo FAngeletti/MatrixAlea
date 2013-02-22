@@ -1,5 +1,5 @@
-function [ solution, err ] = wishfulOptimisation2( f, nIter,epsT, start,verbosity )
-%wishfullOptimisation(f,nIter, epsT, start, verbosity) Try to optimize the function f exploiting a
+function [ solution, err ] = AdhocOptimisation2( f, nIter,epsT, start,verbosity )
+%AdhocOptimisation(f,nIter, epsT, start, verbosity) Try to optimize the function f exploiting a
 %priori information on f with less than nIter steps of optimisation.
 % The algorithm stops as soon as the maximum absolute error is less than epsT. 
 %The verbosity varies between 0 : nothing and 4 : every steps is detailed and the variation of the maximum errer is displayed.
@@ -19,7 +19,7 @@ errv=zeros(1,nIter);
 surv=zeros(1,nIter);
 end
 
-vdisp(v,1,'Wishfull optimisation algorithm starting');
+vdisp(v,1,'Adhoc optimisation algorithm starting');
 solution=start;
 
 fit=f(solution);

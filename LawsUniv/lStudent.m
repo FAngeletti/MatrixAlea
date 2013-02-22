@@ -1,11 +1,11 @@
-classdef lstudent
+classdef lStudent
 	properties
 		mu
 		sigma
         nu
 	end
 	methods
-		function this=lstudent(m,s,n)
+		function this=lStudent(m,s,n)
 		this.mu=m;
 		this.sigma=s;
         this.nu=n;

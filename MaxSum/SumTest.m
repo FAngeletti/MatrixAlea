@@ -19,6 +19,6 @@ Vs=zeros(r,1);
 for i=1:r
     x=Lm.rv();
     plot(x);
-    Vs(i)=max(Lm.rv());
+    Vs(i)=sum(Lm.rv());
 end
 

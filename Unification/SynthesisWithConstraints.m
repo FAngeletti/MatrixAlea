@@ -25,7 +25,7 @@ m=m';
 kp=reshape(kernel_parameters0(k), [s(1) s(2)*s(3)]);
 kp=kp';
 
-Laws=ShredWithKernelWishfully(UnivariateLaws(k) , m, Ws, pts(k), kernel, kp );
+Laws=ShredWithKernel(UnivariateLaws(k) , m, Ws, pts(k), kernel, kp );
 
 p=cell(d,d);
 

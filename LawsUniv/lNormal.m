@@ -1,10 +1,10 @@
-classdef lnormal
+classdef lNormal
 	properties
 		mu
 		sigma
 	end
 	methods
-		function this=lnormal(m,s)
+		function this=lNormal(m,s)
 		this.mu=m;
 		this.sigma=s;
 		end

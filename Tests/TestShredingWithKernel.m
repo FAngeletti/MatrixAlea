@@ -1,5 +1,5 @@
-L=lnormal(0,1);
-%L=lgamma(2,1);
+L=lNormal(0,1);
+%L=lGamma(2,1);
 
 pts=-4:0.01:4;
 %pts=0:0.01:10;

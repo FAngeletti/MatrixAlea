@@ -1,5 +1,5 @@
-function [ solution, err ] = wishfulOptimisation( f, nIter, start )
-%wishfullOptimisation(f,start) Try to optimize the function f exploiting a
+function [ solution, err ] = AdHocOptimisation( f, nIter, start )
+%adHocOptimisation(f,start) Try to optimize the function f exploiting a
 %priori information on f.
 
 s=size(start);

@@ -1,10 +1,10 @@
-classdef lgamma
+classdef lGamma
 	properties
 		alpha
 		beta
 	end
 	methods
-		function this=lgamma(alpha,beta)
+		function this=lGamma(alpha,beta)
 		this.alpha=alpha;
 		this.beta=beta;
 		end

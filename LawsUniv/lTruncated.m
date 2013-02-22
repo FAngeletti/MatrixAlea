@@ -1,4 +1,4 @@
-classdef ltruncated
+classdef lTruncated
     %ltruncated Truncated law generated from a Law L on an intervall I.
     %  e
     
@@ -10,7 +10,7 @@ classdef ltruncated
 
     
     methods
-        function this=ltruncated(L,I)
+        function this=lTruncated(L,I)
             this.I=sort(I);
             this.L=L;
             this.w= L.cumulative(this.I(2))- L.cumulative(this.I(1) );

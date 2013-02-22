@@ -1,7 +1,7 @@
-addpath /Users/pabry/MATLAB/UTILS_STAT/
+
 
 %Dimension de la matrice
-d=6;
+d=8;
 
 
 %Définition de l'opérateur de projection L(M) = <A,M> 
@@ -12,18 +12,18 @@ A=ones(d);
 %moy=zeros(d);
 %var=ones(d);
 
-L0=lnormal(0,1);
-%Lp=lnormal(0,2);
-%Lm=lnormal(0,0.5);
+L0=lNormal(0,2);
+Lpsm=lNormal(1,1);
+Lpsp=lNormal(1,2);
+Lmsm=lNormal(-1,1);
+Lmsp=lNormal(-1,2);
 
-Lp=lgamma(100,0.01);
-Lm=lgamma(1,1);
 
-% Même marginale
-% Correlation nulle
-% Correlation X^2 différente
-diag1={Lp Lp Lp Lm Lm Lm};
-diag2={Lp Lm Lp Lm Lp Lm};
+
+% Marginale, corrélation identique
+% Corrélation d'ordre 2 différente
+diag1={Lpsp Lmsp Lpsp Lmsp Lpsm Lmsm Lpsm Lmsm};
+diag2={Lpsp Lmsp Lpsm Lmsm Lpsp Lmsp Lpsm Lmsm};
 
 %Matrice de lois
 L1=cell(d,d);
@@ -60,7 +60,7 @@ end
 E= p.*Id+q.*(J) ;
 
 % taille de la série temporelle
-n=20000;
+n=10000;
 
 Law1=matrixLaw(A, E , L1 , n);
 Law2=matrixLaw(A,E,L2,n);
@@ -93,15 +93,37 @@ pdftheo=Law2.pdf(bh);
  plot(bh,pdftheo,'g--') ; 
 
 
-xc = xcov(x1.^2,'coeff') ;
+xc = xcov(x1,'coeff') ;
 xc=xc((n+1):end);
 
-xc2 = xcov(x2.^2,'coeff') ;
+xc2 = xcov(x2,'coeff') ;
 xc2=xc2((n+1):end);
 
 len=300;
 ytheo1=zeros(len,1);
 ytheo2=zeros(len,1);
+
+for i=1:len
+ytheo1(i)=Law1.corr(i+1);
+ytheo2(i)=Law2.corr(i+1);
+end
+ 
+figure(4) ; clf 
+plot(xc(1:len) ) ;  grid on; hold on;
+plot(ytheo1,'r--');
+plot(xc2(1:len),'k' ) ;  
+plot(ytheo2,'g--');
+
+
+xcq = xcov(x1.^2,'coeff') ;
+xcq=xcq((n+1):end);
+
+xcq2 = xcov(x2.^2,'coeff') ;
+xcq2=xcq2((n+1):end);
+
+len=300;
+yqtheo1=zeros(len,1);
+yqtheo2=zeros(len,1);
 
 v1=Law1.genMoments([4],[1])-Law1.genMoments([2],[1])^2;
 v2=Law2.genMoments([4],[1])-Law2.genMoments([2],[1])^2;
@@ -111,12 +133,12 @@ mq1=Law1.moments(2);
 mq2=Law2.moments(2);
 
 for i=1:len
-ytheo1(i)=(Law1.genMoments([2 2],[1 (i+1)])-mq1^2)/v1;
-ytheo2(i)=(Law2.genMoments([2 2],[1 (i+1)])-mq2^2)/v2;
+yqtheo1(i)=(Law1.genMoments([2 2],[1 (i+1)])-mq1^2)/v1;
+yqtheo2(i)=(Law2.genMoments([2 2],[1 (i+1)])-mq2^2)/v2;
 end
  
-figure(4) ; clf 
-plot(xc(1:len) ) ;  grid on; hold on;
-plot(ytheo1,'r--');
-plot(xc2(1:len),'k' ) ;  
-plot(ytheo2,'g--');
+figure(5) ; clf 
+plot(xcq(1:len) ) ;  grid on; hold on;
+plot(yqtheo1,'r--');
+plot(xcq2(1:len),'k' ) ;  
+plot(yqtheo2,'g--');

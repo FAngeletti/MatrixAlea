@@ -15,7 +15,7 @@ q=1-p ;
 % Lois de bases
 Lg={lgamma(1,2),lgamma(2,3)};
 
-% Cupure
+% Cut
 cut=cell(2,1);
 for i=1:n
 cut{i}= fzero( @(x) Lg{i}.cumulative(x)-0.5, [0,10]);
@@ -25,8 +25,8 @@ end
 Lp=cell(2,1);
 Lm=cell(2,1);
 for i=1:n
-Lp{i}=ltruncated(Lg{i},[0,cut{i}]);
-Lm{i}=ltruncated(Lg{i},[cut{i},Inf]);
+Lp{i}=lTruncated(Lg{i},[0,cut{i}]);
+Lm{i}=lTruncated(Lg{i},[cut{i},Inf]);
 end
 
 Ls=cell(n,1);
