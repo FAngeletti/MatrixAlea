@@ -80,6 +80,27 @@ classdef matrixLaw
                 Law=CLaws{state,newState};
                 x(i)=Law.rv();
                 state=newState;
+		multiple
+            end
+	end
+
+
+	function [x,h]=hrv(obj)
+	    nt=obj.n;
+            x=zeros(nt,1);
+	    y=zeros(nt+1,1);
+            [state,sink]=obj.initie();
+		
+          %  CurrentT=obj.E^nt;
+            CLaws=obj.Laws;
+	    h(1)=state;
+            for i=1:(nt-1)
+               CurrentT=obj.E^(nt-i);
+                newState=rvFinite( obj.E(state,:).* CurrentT(:,sink)' );
+                Law=CLaws{state,newState};
+                x(i)=Law.rv();
+                state=newState;
+		h(i+1)=state;
             end
 	end
 
