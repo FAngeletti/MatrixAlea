@@ -1,17 +1,15 @@
 
 
-%Dimension de la matrice
+%Matrix dimension
 d=8;
 
 
-%Définition de l'opérateur de projection L(M) = <A,M> 
+%Projection operator (L(M) = <A,M>) 
 A=ones(d);
 
 
-% paramètre des gaussiennes;
-%moy=zeros(d);
-%var=ones(d);
 
+% Basic laws
 L0=lNormal(0,2);
 Lpsm=lNormal(1,1);
 Lpsp=lNormal(1,2);
@@ -20,12 +18,14 @@ Lmsp=lNormal(-1,2);
 
 
 
-% Marginale, corrélation identique
-% Corrélation d'ordre 2 différente
+%% Shared marginal and correlation, corrélation identique
+%% Different square correlation
+
+% Diagonal of the moment matrix
 diag1={Lpsp Lmsp Lpsp Lmsp Lpsm Lmsm Lpsm Lmsm};
 diag2={Lpsp Lmsp Lpsm Lmsm Lpsp Lmsp Lpsm Lmsm};
 
-%Matrice de lois
+%Law matrix
 L1=cell(d,d);
 L2=cell(d,d);
 
@@ -42,7 +42,7 @@ for i=1:d
     end
 end
 
-%Matrice de structure
+%Structure matrix parameter
 p=0.98;
 q=1-p ;
 
@@ -57,9 +57,10 @@ for(i=1:d)
 Id(i,i)=1;
 end 
 
+% Structure matrix
 E= p.*Id+q.*(J) ;
 
-% taille de la série temporelle
+% size of the time series
 n=10000;
 
 Law1=matrixLaw(A, E , L1 , n);

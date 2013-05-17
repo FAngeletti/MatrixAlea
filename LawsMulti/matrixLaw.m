@@ -80,7 +80,6 @@ classdef matrixLaw
                 Law=CLaws{state,newState};
                 x(i)=Law.rv();
                 state=newState;
-		multiple
             end
 	end
 

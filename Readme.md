@@ -66,14 +66,7 @@ subLaws = ShredWithKernel(L , moments, Ws0, pts0, Kern, Kstart )
 
 The script 'tutorial/tShred' contains an example of utilisation of this function 
 
-## Synthesis with constraints
-
-To be written
-## Synthesis with circular matrix
-
-To be written
-
 ## Demos and example
 
-Many (non exactly understandable) examples  are present in the Demos and DemosNS subdirectories.
+Many examples  are present in the Demos and DemosNS subdirectories.
 
