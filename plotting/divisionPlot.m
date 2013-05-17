@@ -17,7 +17,7 @@ nL=length(Laws);
 xlabel('x');
 ylabel('p');
 plot(v,Univ.pdf(v),'k'); hold on;
-sty={'r--', 'b--' };
+sty={'r--', 'b-.' };
 for i=1:nL
     plot(v,Ws(i).*Laws{i}.pdf(v),sty{i});
 end

@@ -1,46 +1,46 @@
-addpath /Users/pabry/MATLAB/UTILS_STAT/
 
-% Même corrélation (non-nulle)
-% Corrélation carré différente
+%% Shared (non-zero) correlation 
+%% Different square correlation
 
-%Dimension de la matrice
+%Matrix dimension
 d=8;
 
 
-%Définition de l'opérateur de projection L(M) = <A,M> 
+%Projection operator (L(M) = <A,M>) 
 A=ones(d);
 
 
-% paramètre des gaussiennes;
-%moy=zeros(d);
-%var=ones(d);
-%Définition des lois
 
-%Loi source
+%Marginal law
 L=lnormal(0,1);
 
-%Points de contrôles
+%Control points
 pts=-5:0.001:5;
 
-%Poids
+%Weights
 Ws=ones(4,1);
 
-%Noyau
+%Kernel
 kernel=@(v,x) exp(-abs((x-v(1))./v(2)));
-%Moments ciblés
+
+%Targeted high average
 mh=0.5;
 
-%Valeur quasi-maximale : vh=1.7
+%Maximal high variance : vh=1.7
 vh=1.6;
 
 vl=2-vh;ml= -mh;
+
+% Targeted moments
 tmoments=[ mh vh; ml vh; mh vl; ml vl ];
 
-% Point de départ des paramètres du noyau
+%Initial kernel parameters
 kstart=tmoments
-% Définition des lois sectionnées
+
+% Decomposition of the marginal distribution in sub-laws
 Ls=ShredWithKernel(L , tmoments, Ws , pts, kernel, kstart);
 
+% Renaming
 L0=L;
 Lpsm=Ls{3};
 Lpsp=Ls{1};
@@ -49,12 +49,14 @@ Lmsp=Ls{2};
 
 
 
-% Marginale, corrélation identique
-% Corrélation d'ordre 2 différente
+%% Shared marginal and correlation
+%% Different square correlation 
+% diag%d : Diagonal of the moment matrix 
+
 diag1={Lpsp Lmsp Lpsp Lmsp Lpsm Lmsm Lpsm Lmsm};
 diag2={Lpsp Lmsp Lpsm Lmsm Lpsp Lmsp Lpsm Lmsm};
 
-%Matrice de lois
+%Law matrix
 L1=cell(d,d);
 L2=cell(d,d);
 
@@ -71,7 +73,7 @@ for i=1:d
     end
 end
 
-%Matrice de structure
+%Structure matrix construction
 p=0.98;
 q=1-p ;
 
@@ -86,9 +88,10 @@ for(i=1:d)
 Id(i,i)=1;
 end 
 
+% Structure matrix
 E= p.*Id+q.*(J) ;
 
-% taille de la série temporelle
+%Size of the time series
 n=500000;
 
 Law1=matrixLaw(A, E , L1 , n);

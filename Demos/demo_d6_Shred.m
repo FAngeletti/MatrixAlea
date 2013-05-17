@@ -3,47 +3,50 @@
 clear all
 close all
 
-% taille de la série temporelle
+% Size of the time series
 n=10000 ;
 
-%Matrice de structure
+%Structure matrix parameters
 p=0.98;
 q=1-p ;
 
-%Loi de base
+%Marginal law
  L=lLaplace(1/sqrt(2));
 
-%Points de contrôles
+%Control points
 pts=-5:0.01:5;
 
-%Poids
+% Weights
 Ws=[1;1]
 
 
-%Noyau
+%Kernel
 kernel=@(v,x) exp(-abs((x-v(1))./v(2)));
-%Moments ciblés
+
+%Targeted moments
 tmoments=[0 0.2; 0 1.8 ];
-% Point de départ des paramètres du noyau
+
+% Initial parameters of the kernel
 kstart=tmoments
-% Définition des lois sectionnées
+
+% Decomposition of the marginal law in sub-laws
 Ls=ShredWithKernel(L , tmoments, Ws , pts, kernel, kstart);
 
 
 Lm=Ls{1};
 Lp=Ls{2};
 
-%Dimension de la matrice
+%Matrix dimension
 d=6;
 
-% affichage
+% Display
 len = 300 ; 
 V = [0 len -0.1 1] ; 
 fontsize = 18 ;  fontsize2 = 15 ; 
 markersize = 5 ; markersize2 = 5 ; 
 linewidth = 2 ; 
 
-%Définition de l'opérateur de projection L(M) = <A,M> 
+%Projection operator ( L(M) = <A,M> ) 
 A=ones(d);
 
 J=zeros(d);
@@ -57,17 +60,17 @@ for(i=1:d)
 Id(i,i)=1;
 end 
 
-%matrice de structure 
+%Structure matrix
 E=p*Id+q*J;
 
 L2=cell(d,d);
 L1=cell(d,d);
 
-
+% D(1) : Diagonal of the moment matrix M(1)
 diag1={Lp,Lm,Lp,Lm,Lp,Lm};
 diag2={Lp,Lp,Lp,Lm,Lm,Lm};
 
-%Matrice de lois
+%Law matrix
 L2=cell(d,d);
 
 for i=1:d
@@ -78,13 +81,10 @@ for i=1:d
 
 end
 
+% Generation of the law with matrix representation
 Law2=matrixLaw(A,E,L2,n);
 Law1=matrixLaw(A,E,L1,n);
 
-%lambdas=CircularEigenValues(E);
-%taus=CircularTaus(lambdas)
-%coeffs1= CircularEigenCoeffs(Law1.matMq(2))
-%coeffs2= CircularEigenCoeffs(Law2.matMq(2))
 
 x1=Law1.rv();
 x2=Law2.rv();
@@ -107,9 +107,7 @@ set(h,'FontSize',fontsize) ;
 
 [hh,bh,gh1]=hist1d(x1,50);
 pdftheo=Law1.pdf(bh);
-% figure(3) ; clf 
-%   plot(bh,hh,'k'); hold on ; grid on ; 
-%   plot(bh,pdftheo,'--') ; 
+
   
   figure(3) ; clf 
   plot(bh,pdftheo(:,1),'b--','LineWidth',linewidth,'MarkerSize',markersize);grid on; hold on;
@@ -119,25 +117,18 @@ axis([-7 7 0 0.55])
 h(1) = ylabel('Marginal') ; 
 set(h,'FontSize',fontsize) ; 
 
-% plot(bh,pdftheo(:,1),'r--','LineWidth',linewidth,'MarkerSize',markersize);
-% axis(V) 
-% h(1) = xlabel('lag \tau') ; 
-% h(2) = ylabel('Cov X^2(\tau) X^2(0)') ; % h(3) = title(name) ; 
-% set(h,'FontSize',fontsize) ; 
-% set(gca,'FontSize',fontsize) 
+
   
 [hh,bh,gh1]=hist1d(x2,100);
 pdftheo=Law2.pdf(bh);
 
-%  plot(bh,hh,'b');
-%  plot(bh,pdftheo,'g--') ; 
+
 figure(4) ; clf 
 plot(bh,pdftheo(:,1),'r--','LineWidth',linewidth,'MarkerSize',markersize);grid on; hold on;
 plot(bh,hh,'k','LineWidth',linewidth,'MarkerSize',markersize ) ;  
 set(gca,'FontSize',fontsize) 
 axis([-7 7 0 0.55])
-% h(1) = ylabel('Marginal') ; 
-% set(h,'FontSize',fontsize) ; 
+
 
  
   %% Corr
@@ -155,12 +146,7 @@ ytheo1(i)=Law1.corr(i);
 ytheo2(i)=Law2.corr(i);
 end
  
-% figure(4) ; clf 
-% plot(xc(1:len) ) ;  grid on; hold on;
-% plot(ytheo1,'r--');
-% plot(xc2(1:len),'k' ) ;  
-% plot(ytheo2,'g--');
-% axis(V) 
+
 
 figure(5) ; clf 
 plot(xc(1:len),'k-','LineWidth',linewidth,'MarkerSize',markersize ) ;  grid on; hold on;
@@ -224,9 +210,6 @@ set(h,'FontSize',fontsize) ;
 set(gca,'FontSize',fontsize) 
 
 % stato(imn,channel).LWT.j1:logstato(imn,channel).LWT.j2),'-','LineWidth',linewidth,'MarkerSize',markersize,'Color',[ p p p]) ;
-% set(gca,'YTick',[0 0.2 0.4 0.6 0.8 1]) ; 
-% set(gca,'XTick',[1:1:jj]) ; 
-% set(gca,'XTickLabel',2.^[1:1:jj]) ;
 
 printfig = 0 ; 
  printpath ='../figs/' ; 
@@ -241,30 +224,3 @@ for i=1:length(suffixes)
 end
 end
 
-%  %% 
-% xc = xcov(x1.^2,'coeff') ;
-% xc=xc((n+1):end);
-% 
-% xc2 = xcov(x2.^2,'coeff') ;
-% xc2=xc2((n+1):end);
-% 
-% len=300;
-% ytheo1=zeros(len,1);
-% ytheo2=zeros(len,1);
-% 
-% v1=Law1.genMoments([4],[1])-Law1.genMoments([2],[1])^2;
-% v2=Law2.genMoments([4],[1])-Law2.genMoments([2],[1])^2;
-% 
-% mq1=Law1.moments(2);
-% mq2=Law2.moments(2);
-% 
-% for i=1:len
-% ytheo1(i)=(Law1.genMoments([2 2],[1 (i+1)])-mq1^2)/v1;
-% ytheo2(i)=(Law2.genMoments([2 2],[1 (i+1)])-mq2^2)/v2;
-% end
-%  
-% figure(4) ; clf 
-% plot(xc(1:len) ) ;  grid on; hold on;
-% plot(ytheo1,'r--');
-% plot(xc2(1:len),'k' ) ;  
-% plot(ytheo2,'g--');

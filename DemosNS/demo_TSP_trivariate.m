@@ -10,47 +10,51 @@ linewidth = 3 ;
 
 pplot=@(x,y,s) plot(x,y,s,'LineWidth',linewidth,'MarkerSize',markersize);
 
-%% Définition des lois sources
+%% Marginal laws
 nP=3;
 %Parents={lGamma(1,3), lGamma(1,3)} ;
 Parents={lNormal(0,1), lGamma(2,1), lGamma(1,2) };
 figcount=1;
 
-%% Découpage des sous lois
-%Nombre de morceaux lois
+%% Decomposition in sub-laws
+%Number of sub-laws by marginal
 nL={2 2 2};
 
 
-% Ws{i}(k) Poids associé à la k-ème sous-lois de la loi source Parents{i}
+% Ws{i}(k) Weights associated to the k-th sub laws of the marginal Parents{i}
 Ws=cellgen(@(i) ones(nL{i},1),nP );
 
 
 
-%Choix des points de contrôles
+%Choice of the control points
 pts={(-4:0.01:4) (0:0.01:10) (0:0.01:10) };
-%On récupère le nombre de points de contrôle
+%Number of control points
 npts=cellgen(@(i) length(pts{i}), nP );
 
+% Definition of the decomposition kernels
 tkern=cell(2,1);
-%On définit un noyau de découpe de loi
+
 
 tkern{2}=@(x) (0.1+x.^2).*exp(-x.^2);
 tkern{1}=@(x) exp(-x.^2);
 %kernel=@(v,x) (sin(2*pi*(x-v(1)))./(x-v(1))).^2;
 %tkern{2}=@(x) (x).^2 .* exp(-(x.^2));
 
-%On choisit des moments cibles
+%Targeted moments
 ATmoments{1}={[-0.5 1 ;0.5 1], [1.5 4.5;2.5 7.5], [1.5 4.5;2.5 11.5]};
 ATmoments{2}={[-0.5 0.5 ;0.5 1.5], [1.5 2.75;2.5 9.25],[1.5 8;2.5 8] };
 
 AKstart{1}={[-0.5 1 ;0.5 1], [1.7 1;2.3 1],  [1.7 1;2.3 1]};
 AKstart{2}={[-0.5 1 ;0.5 1], [1.7 1;2.3 1], [1.7 1;2.3 1]};
 
+% Construction of the law matrix
 for kern=1:2
 for tmom=1:2
+
+% kernel
 kernel=@(v,x) tkern{kern}((x-v(1))./v(2));
 
-% On choisit des moments cibles
+%Targeted moments
 Tmoments= ATmoments{tmom};
 
 
@@ -58,50 +62,52 @@ Tmoments= ATmoments{tmom};
 
 
 
-% Tmoments{k}(l,q) doit correspondre au q-ème moment de la sous-loi l de la loi parente k.
-% Attention! La somme des moments partiels doit rester égale au moment de la loi parente.
-% De plus, les bornes présentés, ci-haut sont très proches des bornes maximales. Les dépasser empêchera
-% probablement Shred...Wishfully de converger. 
+% Tmoments{k}(l,q) must correspond to the moment of order q of the sublaw l  of the marginal  k.
+% Warning! The sums of the paryial moments must stay equal to 
+the moment of the marginal law. 
+% Moreover, the bounds used here are probably near the maximal bounds. 
+%The convergence of ShredWithKernel is very uncertain
+beyond them.
 
+ 
 
-%En première approximation, on considère que les centres des noyaux devraient être proche des moments choisi
+%Intial parameters for the kernl : 
 Kstart=AKstart{tmom};
 
 
-% À partir de ces données ShredWithKernel construit les nL{i} sous lois
-% associés aux nP lois parentes.
-% Laws{i}{k} correspond à la k-ème sous-lois associés à la i-ème loi
-% parente
+% Construction of the decompositions of the marginal distributions
+% Laws{i}{k} correspond to the k-th sub-laws of the i-th marginal distribution
 
 Laws=cellgen( @(i) ShredWithKernel(Parents{i} , Tmoments{i}, Ws{i}, pts{i}, kernel, Kstart{i} ), nP) ;
 
 for i=1:nP
+% Figures are printed in a figs/V3 subdirectory
 path= sprintf('figs/V3/updf%d_%d_kern%d.eps',i,tmom,kern);    
 divisionPlot(Parents{i},Laws{i},Ws{i},pplot,printf(path),figcount); % figcount=figcount+1;
 end
 
-%% Définition de E
+%% Dimension of E
 d=2;
 
-% Matrice identité
+% Idendity matrix
 Id=zeros(d);
 for i=1:d
     Id(i,i)=1;
 end
 
-% Matrice circulaire
+% Circulant matrix
 Jd=zeros(d);
 for i=1:d
     Jd(i, mod(i, d) +1)=1;
 end
 
 
-%% Définition de A
+%% Définition of A
 A=ones(d);
 
-%% Définition des  matrices de proabilité
-% Définition de la fonction probabilité matriciel
-% MP(k) représente la matrice de probabilité au temps k.
+%% Construction of the law (pdf) matrix function MP(k)
+% MP(k) is the matrix probability at time k 
+% Mc is the cell used to stocked MP(k)
 Mc=cell(nP,1);
 
 for i=1:nP
@@ -119,38 +125,34 @@ for k=1:d
 end
 end
 
+% Creation of MP 
 MP= @(i) Mc{i} ;
 
-ps=[0.1,0.75];
+% Different values of p
+ps=[0.1,0.8];
 
 for p=ps
 
 q=1-p;
 
-% Matrice de structure E
+% Structure matrix E
 E=p*Id+q*Jd;
 
 
-%% Définition de la loi matricielles
+%% Construction of the random vector with matrix representation
 Law=matrixLawNS(A,E,MP,nP);
 
-%% Paramètre de plot
+%% Plotting parameters
 fontsize = 18 ;  fontsize2 = 15 ; 
 markersize = 5 ; markersize2 = 5 ; 
 linewidth = 2 ; 
 
 
-%% pdf multivarié theorique
-
+%% Theoretical multivariate pdf
 nx=50;
 ny=50;
  
-%stepx= (xmax - xmin) /(nx-1);
-%stepy= (ymax - ymin) /(ny-1);
- 
 
-%vy=ymin:stepy:ymax;
-%vx=xmin:stepx:xmax;
 
 vy=0:0.1:6;
 vx=-3:0.1:3;
@@ -171,6 +173,9 @@ printingBv= @(a,b) printing(name(a,b));
         Z(j,i)=(Law.mvPartialPdf([1 2],[vx(i) vy(j)])) ;
      end
  end
+
+colormap( flipud( gray(20) ) );
+
 figure(figcount); clf;
  contourf(Gx,Gy,Z,20);
  printingBv(1,2);

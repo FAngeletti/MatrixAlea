@@ -9,6 +9,7 @@ p=0.8; q= 0.2;
 E = [ p q; q p];
 
 % Distribution matrix: Matrix of the laws of the observable
+<<<<<<< HEAD
 sigma=1;
 % lNormal(mu,sigma) : gaussian random variable with average mu and variance sigma^2 
 Laws={ lNormal(-1,sigma), lNormal(0,2*sigma) ; 

@@ -1,4 +1,4 @@
-% Définition des lois par coupure
+% Law definition by clamping
 
 clear all
 close all
@@ -8,20 +8,20 @@ close all
 % taille de la série temporelle
 n=2 ;
 
-%Matrice de structure
+%Structure matrix parameter
 p=0.98;
 q=1-p ;
 
 % Lois de bases
 Lg={lgamma(1,2),lgamma(2,3)};
 
-% Cut
+% Cutting points
 cut=cell(2,1);
 for i=1:n
 cut{i}= fzero( @(x) Lg{i}.cumulative(x)-0.5, [0,10]);
 end
 
-%Découpage des lois de bases
+% Definition of the clamped laws
 Lp=cell(2,1);
 Lm=cell(2,1);
 for i=1:n
@@ -31,23 +31,23 @@ end
 
 Ls=cell(n,1);
 
-%Construction de la matrice
+%Construction of the law matrix P
 for i=1:n
     tmp={Lm{i} Lp{i}; Lm{i} Lp{i} };
     Ls{i}=tmp;
 end
 
-%Dimension de la matrice
+%Matrix dimension
 d=2;
 
-% affichage
+% display
 len = 300 ; 
 V = [0 len -0.1 1] ; 
 fontsize = 18 ;  fontsize2 = 15 ; 
 markersize = 5 ; markersize2 = 5 ; 
 linewidth = 2 ; 
 
-%Définition de l'opérateur de projection L(M) = <A,M> 
+% Projection operator (L(M) = <A,M>) 
 A=ones(d);
 
 J=zeros(d);
@@ -61,13 +61,14 @@ for i=1:d
 Id(i,i)=1;
 end 
 
-%matrice de structure 
+%Structure matrix 
 E=p*Id+q*J;
 
 
-
+% Cell to function trickery
 gen= @(x)( @(n) x{n});
 
+% Definition of the multivariate law
 Law=matrixLawNS(A,E,gen(Ls),n);
 
 
